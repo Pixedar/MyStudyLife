@@ -50,7 +50,7 @@ public class MyService extends Service {
         mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setLargeIcon(bm)
                 .setSmallIcon(R.drawable.small_icon_24dp)
-                .setColor(Color.rgb(0, 183 - 40, 220 - 40))
+                .setColor(Color.rgb(0, 153, 204))
                 .setPriority(1)
                 .setAutoCancel(false);
         Intent intent = new Intent(this, MyService.class);
@@ -103,10 +103,12 @@ public class MyService extends Service {
                                 mBuilder.setLargeIcon(a);
                                 mBuilder.setAutoCancel(true);
                                 mBuilder.setContentTitle(details.description);
+                                mBuilder.setColor(Color.RED);
                                 mNotificationManager.notify(1, mBuilder.build());
                                 Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
                                 mBuilder.setLargeIcon(b);
                                 mBuilder.setAutoCancel(false);
+                                mBuilder.setColor(Color.rgb(0, 153, 204));
                             }
                         }
                     }
@@ -120,12 +122,14 @@ public class MyService extends Service {
                     if (luckyNumbers.getA() == 35 || luckyNumbers.getB() == 35) {
                         Bitmap a = BitmapFactory.decodeResource(getResources(), R.mipmap.present);
                         mBuilder.setLargeIcon(a);
+                        mBuilder.setColor(Color.RED);
                         mBuilder.setContentTitle("Masz sczęśliwy !!!");
                         mBuilder.setAutoCancel(true);
                         mNotificationManager.notify(3, mBuilder.build());
                         Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
                         mBuilder.setLargeIcon(b);
                         mBuilder.setAutoCancel(false);
+                        mBuilder.setColor(Color.rgb(0, 153, 204));
                     }
                     checkLuckyNumber = false;
                 } catch (IOException e) {
