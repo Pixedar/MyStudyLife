@@ -46,10 +46,10 @@ public class MyService extends Service {
             StrictMode.setThreadPolicy(policy);
         }
 
-        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.Lesson);
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
         mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setLargeIcon(bm)
-                .setSmallIcon(R.drawable.Small_icon)
+                .setSmallIcon(R.drawable.small_icon_24dp)
                 .setColor(Color.rgb(0, 183 - 40, 220 - 40))
                 .setPriority(1)
                 .setAutoCancel(false);
@@ -99,12 +99,12 @@ public class MyService extends Service {
                         if (details.description.contains("3 aLO")) {
                             replacements.add(details);
                             if (details.description.contains("Uczniowie przychodzą później")) {
-                                Bitmap a = BitmapFactory.decodeResource(getResources(), R.mipmap.Present);
+                                Bitmap a = BitmapFactory.decodeResource(getResources(), R.mipmap.present);
                                 mBuilder.setLargeIcon(a);
                                 mBuilder.setAutoCancel(true);
                                 mBuilder.setContentTitle(details.description);
                                 mNotificationManager.notify(1, mBuilder.build());
-                                Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.Lesson);
+                                Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
                                 mBuilder.setLargeIcon(b);
                                 mBuilder.setAutoCancel(false);
                             }
@@ -118,12 +118,12 @@ public class MyService extends Service {
                 try {
                     LuckyNumbers luckyNumbers = LuckyNumbers.getLuckyNumbers();
                     if (luckyNumbers.getA() == 35 || luckyNumbers.getB() == 35) {
-                        Bitmap a = BitmapFactory.decodeResource(getResources(), R.mipmap.Present);
+                        Bitmap a = BitmapFactory.decodeResource(getResources(), R.mipmap.present);
                         mBuilder.setLargeIcon(a);
                         mBuilder.setContentTitle("Masz sczęśliwy !!!");
                         mBuilder.setAutoCancel(true);
                         mNotificationManager.notify(3, mBuilder.build());
-                        Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.Lesson);
+                        Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
                         mBuilder.setLargeIcon(b);
                         mBuilder.setAutoCancel(false);
                     }

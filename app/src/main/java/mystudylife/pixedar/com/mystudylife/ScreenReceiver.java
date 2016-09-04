@@ -58,7 +58,7 @@ public class ScreenReceiver extends BroadcastReceiver {
                     } catch (IndexOutOfBoundsException e) {
                         lessonName = "Wolne!!";
                         builder.setColor(Color.GREEN);
-                        Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.mipmap.Home);
+                        Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.mipmap.home);
                         builder.setLargeIcon(bm);
                     }
                     break;
