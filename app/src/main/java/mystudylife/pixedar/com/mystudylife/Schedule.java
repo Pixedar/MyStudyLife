@@ -26,8 +26,8 @@ public class Schedule {
         d1.add("inf CW 100");
         d1.add("inf CW 100");
 
-        d2.add(null);
-        d2.add(null);
+        d2.add("E");
+        d2.add("E");
         d2.add("j.angielski ST 304");
         d2.add("j.angielski ST 304");
         d2.add("j.polski PM 203");
@@ -36,14 +36,14 @@ public class Schedule {
         d2.add("fizyka KG 307");
         d2.add("HIS B_ 202");
 
-        d3.add(null);
-        d3.add(null);
+        d3.add("E");
+        d3.add("E");
         d3.add("matematyka WM 201");
         d3.add("fizyka KG 307");
         d3.add("j.polski PM 203");
         d3.add("matematyka WM 201");
 
-        d4.add(null);
+        d4.add("E");
         d4.add("j.angielski ST 304");
         d4.add("j.niemiecki Sz 205");
         d4.add("matematyka WM 201");
@@ -126,9 +126,10 @@ public class Schedule {
                 calendar.set(Calendar.MINUTE, 35);
                 return calendar;
         }
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 35);
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 0);
         return calendar;
     }
+
 }
 

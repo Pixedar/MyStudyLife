@@ -21,14 +21,22 @@ public class Alarm extends BroadcastReceiver {
         Calendar calendar = Calendar.getInstance();
 
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
-            calendar.add(Calendar.DATE, 2);
-        } else if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+            calendar.add(Calendar.DATE, 3);
+        } else {
             calendar.add(Calendar.DATE, 1);
         }
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
+            calendar.set(Calendar.HOUR_OF_DAY, 9);
+            calendar.set(Calendar.MINUTE, 0);
+        } else if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) {
+            calendar.set(Calendar.HOUR_OF_DAY, 8);
+            calendar.set(Calendar.MINUTE, 0);
+        } else {
+            calendar.set(Calendar.HOUR_OF_DAY, 7);
+            calendar.set(Calendar.MINUTE, 0);
+        }
 
-        calendar.set(Calendar.HOUR_OF_DAY, 7);
-        calendar.set(Calendar.MINUTE, 0);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
     public void cancelAlarm(Context context) {

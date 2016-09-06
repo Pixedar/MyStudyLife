@@ -20,12 +20,15 @@ public class ScreenReceiver extends BroadcastReceiver {
     private NotificationCompat.Builder builder;
     private Schedule schedule;
     private ArrayList<String> currentDay;
+    private GetReplacements getReplacements;
 
-    public ScreenReceiver(NotificationManager notificationManager, NotificationCompat.Builder builder, Schedule schedule, ArrayList<String> currentDay) {
+    public ScreenReceiver(NotificationManager notificationManager, NotificationCompat.Builder builder, Schedule schedule, ArrayList<String> currentDay, Context context) {
         this.notificationManager = notificationManager;
         this.builder = builder;
         this.schedule = schedule;
         this.currentDay = currentDay;
+        getReplacements = new GetReplacements(context, this.builder, this.notificationManager);
+        getReplacements.execute();
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
@@ -42,14 +45,9 @@ public class ScreenReceiver extends BroadcastReceiver {
 
             for (String lesson : currentDay) {
                 if (calendar.before(schedule.getDuration(Calendar.getInstance(), index))) {
-                    long difference = schedule.getDuration(calendar, index).getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
-                    time = (int) difference / 60000;
-                    if (time > 45) {
-                        time = time - 45;
-                    }
                     try {
-                        lessonName = currentDay.get(index + 1);
-                        for (ReplacementDetails details : MyService.replacements) {
+                        lessonName = "Następna: " + currentDay.get(index + 1);
+                        for (ReplacementDetails details : getReplacements.getReplacements()) {
                             if (index + 1 == details.lesson - 1) {
                                 lessonName = details.description.substring(details.description.indexOf("- ") + 1) + details.replacer;
                                 break;
@@ -57,40 +55,29 @@ public class ScreenReceiver extends BroadcastReceiver {
                         }
                     } catch (IndexOutOfBoundsException e) {
                         lessonName = "Wolne!!";
-                        builder.setColor(Color.rgb(155,204,95));
+                        builder.setColor(Color.rgb(155, 204, 95));
                         Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.mipmap.home);
                         builder.setLargeIcon(bm);
                     }
+                    long difference = schedule.getDuration(calendar, index).getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+                    time = (int) difference / 60000;
+                    if (time > 45) {
+                        time = time - 45;
+                        lessonName = lesson;
+                        getReplacements = new GetReplacements(context, builder, notificationManager);
+                        getReplacements.execute();
+                    }
+
                     break;
                 }
                 index++;
             }
 
             builder.setContentTitle("Do dzownka: " + String.valueOf(time) + " min");
-            builder.setContentText("Następna: " + lessonName);
+            builder.setContentText(lessonName);
 
             if (lessonName == null) {
-                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) > 8) {
-                    context.stopService(new Intent(context, MyService.class));
-                } else {
-                    MyService.getReplacements.execute();
-                    builder.setContentText("");
-                    int i = 0;
-                    for (String lesson : currentDay) {
-                        i++;
-                        if (lesson != null) {
-                            builder.setContentText(lesson);
-                            for (ReplacementDetails details : MyService.replacements) {
-                                if (i == details.lesson) {
-                                    builder.setContentTitle(details.description);
-                                    break;
-                                }
-                            }
-                            notificationManager.notify(0, builder.build());
-                            break;
-                        }
-                    }
-                }
+                context.stopService(new Intent(context, MyService.class));
             } else {
                 notificationManager.notify(0, builder.build());
             }
@@ -101,5 +88,6 @@ public class ScreenReceiver extends BroadcastReceiver {
             notificationManager.cancel(0);
         }
     }
+
 
 }

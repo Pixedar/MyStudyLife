@@ -10,14 +10,11 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.StrictMode;
 import android.support.v4.app.NotificationCompat;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MyService extends Service {
@@ -26,11 +23,9 @@ public class MyService extends Service {
     ArrayList<String> currentDay;
     Alarm alarm = new Alarm();
     Schedule schedule;
-    NotificationCompat.Builder mBuilder;
-    NotificationManager mNotificationManager;
-    public static ArrayList<ReplacementDetails> replacements = new ArrayList<>();
-    public static getReplacements getReplacements;
-    boolean checkLuckyNumber = true;
+    NotificationCompat.Builder builder;
+    NotificationManager notificationManager;
+    static boolean checkLuckyNumber = true;
 
     @Override
     public void onCreate() {
@@ -38,7 +33,7 @@ public class MyService extends Service {
         currentDay = schedule.getScheduleForCurrentDay();
         schedule.clear();
 
-        getReplacements = new getReplacements();
+        GetReplacements getReplacements = new GetReplacements(this, builder, notificationManager);
         getReplacements.execute();
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -47,23 +42,23 @@ public class MyService extends Service {
         }
 
         Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
-        mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setLargeIcon(bm)
+        builder = new NotificationCompat.Builder(this);
+        builder.setLargeIcon(bm)
                 .setSmallIcon(R.drawable.small_icon_24dp)
                 .setColor(Color.rgb(0, 153, 204))
                 .setPriority(1)
                 .setAutoCancel(false);
         Intent intent = new Intent(this, MyService.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-        mBuilder.setContentIntent(pi);
-        mNotificationManager =
+        builder.setContentIntent(pi);
+        notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_USER_PRESENT);
 
-        mReceiver = new ScreenReceiver(mNotificationManager, mBuilder, schedule, currentDay);
+        mReceiver = new ScreenReceiver(notificationManager, builder, schedule, currentDay, this);
         registerReceiver(mReceiver, filter);
         alarm.setAlarm(this);
     }
@@ -78,7 +73,7 @@ public class MyService extends Service {
     @Override
     public void onDestroy() {
         // STOP YOUR TASKS
-        mNotificationManager.cancelAll();
+        notificationManager.cancelAll();
         unregisterReceiver(mReceiver);
         super.onDestroy();
     }
@@ -89,57 +84,4 @@ public class MyService extends Service {
     }
 
 
-    class getReplacements extends AsyncTask<Void, Void, List<String>> {
-        @Override
-        protected List<String> doInBackground(Void... unused) {
-            try {
-                ArrayList<TeacherReplacement> missingTeachers = SiteParser.getReplacements();
-                for (TeacherReplacement missingTeacher : missingTeachers) {
-                    for (ReplacementDetails details : missingTeacher.replacements) {
-                        if (details.description.contains("3 aLO")) {
-                            replacements.add(details);
-                            if (details.description.contains("Uczniowie przychodzą później")) {
-                                Bitmap a = BitmapFactory.decodeResource(getResources(), R.mipmap.present);
-                                mBuilder.setLargeIcon(a);
-                                mBuilder.setAutoCancel(true);
-                                mBuilder.setContentTitle(details.description);
-                                mBuilder.setColor(Color.RED);
-                                mNotificationManager.notify(1, mBuilder.build());
-                                Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
-                                mBuilder.setLargeIcon(b);
-                                mBuilder.setAutoCancel(false);
-                                mBuilder.setColor(Color.rgb(0, 153, 204));
-                            }
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (checkLuckyNumber) {
-                try {
-                    LuckyNumbers luckyNumbers = LuckyNumbers.getLuckyNumbers();
-                    if (luckyNumbers.getA() == 35 || luckyNumbers.getB() == 35) {
-                        Bitmap a = BitmapFactory.decodeResource(getResources(), R.mipmap.present);
-                        mBuilder.setLargeIcon(a);
-                        mBuilder.setColor(Color.RED);
-                        mBuilder.setContentTitle("Masz sczęśliwy !!!");
-                        mBuilder.setAutoCancel(true);
-                        mNotificationManager.notify(3, mBuilder.build());
-                        Bitmap b = BitmapFactory.decodeResource(getResources(), R.mipmap.lesson);
-                        mBuilder.setLargeIcon(b);
-                        mBuilder.setAutoCancel(false);
-                        mBuilder.setColor(Color.rgb(0, 153, 204));
-                    }
-                    checkLuckyNumber = false;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return null;
-        }
-
-
-    }
 }
